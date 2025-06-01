@@ -4,6 +4,7 @@ from datetime import datetime
 from abc import ABC, abstractmethod
 from datetime import date, timedelta
 import random
+from typing import List
 from PIL import Image, ImageTk
 
 
@@ -86,9 +87,9 @@ class BasicTicket(Ticket):
 
     def set_times(self):
         self.time_forward = (f"{random.randint(0, 23)}:"
-                               f"{random.randint(0, 5)}{random.randint(0, 9)}")
+                             f"{random.randint(0, 5)}{random.randint(0, 9)}")
         self.time_backward = (f"{random.randint(0, 23)}:"
-                                f"{random.randint(0, 5)}{random.randint(0, 9)}")
+                              f"{random.randint(0, 5)}{random.randint(0, 9)}")
 
 
 class PremiumTicket(Ticket):
@@ -101,9 +102,9 @@ class PremiumTicket(Ticket):
 
     def set_times(self):
         self.time_forward = (f"{random.randint(0, 23)}:"
-                               f"{random.randint(0, 5)}{random.randint(0, 9)}")
+                             f"{random.randint(0, 5)}{random.randint(0, 9)}")
         self.time_backward = (f"{random.randint(0, 23)}:"
-                                f"{random.randint(0, 5)}{random.randint(0, 9)}")
+                              f"{random.randint(0, 5)}{random.randint(0, 9)}")
 
 
 class Hotel(ABC):
@@ -235,7 +236,7 @@ class CreditCard(PaymentStrategy):
         self.cvv = cvv
 
     def pay(self, amount: float) -> bool:
-        if len(self.card_number) != 16 or self.card_holder=="" or self.expiry_date=="" or self.cvv=="":
+        if len(self.card_number) != 16 or self.card_holder == "" or self.expiry_date == "" or self.cvv == "":
             return False
         return True
 
@@ -374,7 +375,7 @@ class TravelService:
         }
 
         self.cities = ["Нижний Новгород", "Санкт-Петербург", "Москва", "Анапа", "Кострома", "Владимир",
-                                 "Великий Устюг", "Вологда", "Архангельск"]
+                       "Великий Устюг", "Вологда", "Архангельск"]
 
         self.hotels_data = {
             "Архангельск": [
@@ -415,7 +416,7 @@ class TravelService:
                 {"name": "Азимут", "type": "basic", "price": 3800, "rating": 3.9, "star": 3},
                 {"name": "Sheraton", "type": "premium", "price": 12000, "rating": 4.7, "star": 5}
             ]
-            }
+        }
 
         self.tours_data = {
             "Архангельск": [
@@ -493,7 +494,7 @@ class TravelService:
             return "осень"
 
     def generate_tickets(self, departure: str, destination: str, date_forward: date, date_backward: date,
-                         package_type: str) -> list[Ticket]:
+                         package_type: str) -> List[Ticket]:
         tickets = []
         factory = self.factories[package_type]
 
@@ -510,7 +511,7 @@ class TravelService:
 
         return tickets
 
-    def get_available_hotels(self, city: str, package_type: str, start_date: date, end_date: date) -> list[Hotel]:
+    def get_available_hotels(self, city: str, package_type: str, start_date: date, end_date: date) -> List[Hotel]:
         hotels = []
         city_hotels = self.hotels_data.get(city)
         factory = self.factories[package_type]
@@ -518,7 +519,7 @@ class TravelService:
         for hotel_data in city_hotels:
             if package_type == hotel_data["type"]:
                 hotel = factory.create_hotel()
-                
+
                 hotel.name = hotel_data["name"]
                 hotel.city = city
                 hotel.price = hotel_data["price"]
@@ -526,12 +527,12 @@ class TravelService:
                 hotel.star = hotel_data["star"]
                 hotel.check_in = start_date
                 hotel.check_out = end_date
-                
+
                 hotels.append(hotel)
 
         return hotels
 
-    def get_available_tours(self, city: str, package_type: str, travel_date: date) -> list[Tour]:
+    def get_available_tours(self, city: str, package_type: str, travel_date: date) -> List[Tour]:
         tours = []
         season = self.get_season(travel_date)
         city_tours = self.tours_data.get(city)
@@ -545,12 +546,12 @@ class TravelService:
                     tour.description = tour_data["description"]
                     tour.price = tour_data["price"]
                     tour.season = tour_data["season"]
-                    
+
                     tours.append(tour)
 
         return tours
 
-    def get_available_services(self, city: str, duration: int, package_type: str) -> list[AdditionalServices]:
+    def get_available_services(self, city: str, duration: int, package_type: str) -> List[AdditionalServices]:
         services = []
 
         sim_card = SimCard(city, package_type)
@@ -615,8 +616,8 @@ class TravelApp:
             try:
                 image_path = f"{city}.jpg"
                 image = Image.open(image_path)
-                if city=="Москва" or city=="Нижний Новгород":
-                    image = image.resize((470,600))
+                if city == "Москва" or city == "Нижний Новгород":
+                    image = image.resize((470, 600))
                 else:
                     image = image.resize((600, 400))
             except FileNotFoundError:
@@ -651,7 +652,7 @@ class TravelApp:
         self.start_date_entry.insert(0, datetime.now().strftime("%Y-%m-%d"))
 
         ttk.Label(parameters_frame, text="Дата окончания (ГГГГ-ММ-ДД):").grid(row=3, column=0, padx=5, pady=5,
-                                                                          sticky=tk.W)
+                                                                              sticky=tk.W)
         self.end_date_entry = ttk.Entry(parameters_frame)
         self.end_date_entry.grid(row=3, column=0, padx=200, pady=5, sticky=tk.EW)
         self.end_date_entry.insert(0, (datetime.now() + timedelta(days=7)).strftime("%Y-%m-%d"))
@@ -700,14 +701,15 @@ class TravelApp:
                 raise ValueError("Введите город отправления")
             if end_date <= start_date:
                 raise ValueError("Дата окончания должна быть позже даты начала")
-            if start_date<date.today():
+            if start_date < date.today():
                 raise ValueError("Ваш рейс улетел")
 
             self.available_tickets = self.travel_service.generate_tickets(departure, destination, start_date, end_date,
                                                                           package_type)
             self.show_tickets()
 
-            self.available_hotels = self.travel_service.get_available_hotels(destination, package_type, start_date, end_date)
+            self.available_hotels = self.travel_service.get_available_hotels(destination, package_type, start_date,
+                                                                             end_date)
             self.show_hotels()
 
             self.available_tours = self.travel_service.get_available_tours(destination, package_type, start_date)
@@ -860,7 +862,6 @@ class TravelApp:
                                 command=lambda: self.notebook.select(self.payment_tab))
         pay_button.pack(pady=10)
 
-
     def setup_payment_tab(self):
         self.payment_frame = ttk.Frame(self.payment_tab)
         self.payment_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
@@ -951,6 +952,7 @@ class TravelApp:
 
         except Exception as e:
             messagebox.showerror("Ошибка", f"Ошибка при обработке платежа")
+
 
 root = tk.Tk()
 app = TravelApp(root)
