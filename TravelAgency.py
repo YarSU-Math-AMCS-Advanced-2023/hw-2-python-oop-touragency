@@ -851,16 +851,21 @@ class TravelApp:
         self.results_text.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
         self.results_text.insert(tk.END, "Здесь будет отображаться ваше путешествие после создания.")
         self.results_text.config(state=tk.DISABLED)
+        self.pay_button = ttk.Button(self.results_tab, text="Перейти к оплате", command=self.correct_pay_button)
+        self.pay_button.pack(pady=10)
+
+    def correct_pay_button(self):
+        try:
+            amount = self.travel_package.get_total_price()
+            self.notebook.select(self.payment_tab)
+        except Exception as e:
+            messagebox.showerror("Ошибка", f"Пакет не создан")
 
     def show_results(self, package):
         self.results_text.config(state=tk.NORMAL)
         self.results_text.delete(1.0, tk.END)
         self.results_text.insert(tk.END, package.get_description())
         self.results_text.config(state=tk.DISABLED)
-
-        pay_button = ttk.Button(self.results_tab, text="Перейти к оплате",
-                                command=lambda: self.notebook.select(self.payment_tab))
-        pay_button.pack(pady=10)
 
     def setup_payment_tab(self):
         self.payment_frame = ttk.Frame(self.payment_tab)
