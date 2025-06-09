@@ -251,6 +251,14 @@ class PayPal(PaymentStrategy):
         return True
 
 
+class Context:
+    def __init__(self, payment_strategy: PaymentStrategy):
+        self.payment_strategy = payment_strategy
+
+    def pay(self, amount):
+        return self.payment_strategy.pay(amount)
+
+
 class BankTransfer(PaymentStrategy):
     def __init__(self, account_number: str, bank_name: str):
         self.account_number = account_number
@@ -948,8 +956,8 @@ class TravelApp:
                     account_number=self.account_number.get(),
                     bank_name=self.bank_name.get()
                 )
-
-            if strategy.pay(amount):
+            context = Context(strategy)
+            if context.pay(amount):
                 messagebox.showinfo("Успех", "Оплата прошла успешно! \n Вперед идет локомотив!")
             else:
                 messagebox.showerror("Ошибка", "Не удалось выполнить оплату "
